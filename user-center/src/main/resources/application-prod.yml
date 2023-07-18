@@ -4,8 +4,11 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://123.60.173.213:3306/user_center
-    username: localroot
-    password: 123Lujingrui.
+    username: root
+    password: root
   # session 失效时就按
   session:
     timeout: 86400
+server:
+  address: 0.0.0.0
+  port: 8080

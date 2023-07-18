@@ -4,6 +4,7 @@ package com.jingrui.usercenter.common;
  * 错误码
  */
 public enum ErrorCode {
+
     /**
      * 如果严谨的话这边要给下面的枚举值打上注释
      */

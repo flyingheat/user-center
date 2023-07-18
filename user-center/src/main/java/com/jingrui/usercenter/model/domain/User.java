@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 public class User implements Serializable {
     /**
-     * 
+     * id
      */
     @TableId
     private long id;
@@ -49,6 +49,10 @@ public class User implements Serializable {
      * 电话
      */
     private String phone;
+    /**
+     * 标签列表 json
+     */
+    private String tags;
 
     /**
      * 邮箱

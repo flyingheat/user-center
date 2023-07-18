@@ -4,6 +4,10 @@ import com.jingrui.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+import static com.jingrui.usercenter.constant.UserConstant.ADMIN_ROLE;
+import static com.jingrui.usercenter.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
 * @author 陆璟瑞
@@ -11,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 * @createDate 2023-02-11 13:32:02
 */
 public interface UserService extends IService<User> {
-
 
 
     /**
@@ -37,7 +40,7 @@ public interface UserService extends IService<User> {
      * @param originUser
      * @return
      */
-    User getSatetyUser(User originUser);
+    User getSafetyUser(User originUser);
 
     /**
      *  请求用户注销
@@ -46,4 +49,37 @@ public interface UserService extends IService<User> {
      */
     int userLogout(HttpServletRequest request);
 
+    /**
+     * 根据标签搜索用户
+     * @param tagNameList 用户需要拥有的标签
+     * @return
+     */
+    List<User> searchUsersByTags(List<String> tagNameList);
+
+    /**
+     * 用户跟新信息
+     * @param user
+     * @return
+     */
+    int updateUser(User user,User loginUser);
+
+    /**
+     * 获取当前登录用户信息
+     * @return
+     */
+    User getLoginUser(HttpServletRequest request);
+
+    /**
+     * 是否为管理员
+     * @param request
+     * @return
+     */
+     boolean isAdmin(HttpServletRequest request);
+
+    /**
+     * 是否为管理员
+     * @param loginUser
+     * @return
+     */
+    boolean isAdmin(User loginUser);
 }
