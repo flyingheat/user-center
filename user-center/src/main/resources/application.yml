@@ -5,7 +5,7 @@ spring:
     name: user-center
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/yupi
+    url: jdbc:mysql://localhost:3306/yupi?serverTimezone=UTC
     username: root
     password: root
   # session 失效时就按

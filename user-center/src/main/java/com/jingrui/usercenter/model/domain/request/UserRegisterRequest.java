@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 用户注册 请求体  习惯性的在传输值的时候 实现 序列接口化
+ * 用户注册 请求体  习惯性的在传输值的时候 实现 序列接口化 全是用来请求参数
  */
 @Data
 public class UserRegisterRequest implements Serializable {

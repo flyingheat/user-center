@@ -80,6 +80,11 @@
             <version>2.6.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.1</version>
+        </dependency>
 
         <!--StringUtils 方法 组件库-->
         <dependency>

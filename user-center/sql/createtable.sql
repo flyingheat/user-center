@@ -44,8 +44,6 @@ create index idx_userId
     on tag (userId);
 
 
-
--- auto-generated definition
 create table team
 (
     id           bigint auto_increment primary key,
@@ -77,6 +75,8 @@ create table user_team
 
 )
     comment '用户队伍关系';
+
+-- auto-generated definition
 
 
 
