@@ -50,7 +50,7 @@ create table team
     name     varchar(256)                 not  null comment '队伍名称',
     description    varchar(1024)                       null comment '描述',
     maxNum  			int    default 1                 null comment '最大人数',
-    userId       bigint                           not null comment '创建人id',
+    userId       bigint                           not null comment '用户id（队长id）',
     expireTime   datetime                         null comment '过期时间',
     password    varchar(256)                        null comment '密码',
     status      int      default 0                 null comment '状态  0-公开 ， 1-私有，2-加密',

@@ -9,6 +9,7 @@ import com.jingrui.usercenter.exception.BusinessException;
 import com.jingrui.usercenter.model.domain.User;
 import com.jingrui.usercenter.model.domain.request.UserLoginRequest;
 import com.jingrui.usercenter.model.domain.request.UserRegisterRequest;
+import com.jingrui.usercenter.model.vo.UserVo;
 import com.jingrui.usercenter.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -136,6 +137,7 @@ public class UserController {
         return ResultUtils.success(collect);
     }
 
+    // todo 推荐多个
     @GetMapping("/recommend")
     public BaseResponse<Page<User>> recommendUsers(long pageSize,long pageNum,HttpServletRequest request){
         User loginUser = userService.getLoginUser(request);
@@ -179,4 +181,22 @@ public class UserController {
         boolean b = userService.removeById(id);//框架会自动把我们删除改称为逻辑删除 在删除时会自动改为更新
         return ResultUtils.success(b);
     }
+
+    /**
+     * 获取最匹配的用户
+     * @param request
+     * @return
+     */
+    @GetMapping("/match")
+    public BaseResponse<List<User>> matchUsers(long num, HttpServletRequest request){
+
+        //限定查数据的地方一定要设置查询数量
+        if(num <= 0 || num > 20){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User user = userService.getLoginUser(request);
+        return ResultUtils.success(userService.matchUsers(num,user));
+
+    }
+
 }

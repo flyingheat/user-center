@@ -13,6 +13,7 @@ public enum ErrorCode {
     NULL_ERROR(40001,"请求数据为空",""),
     NO_AUTH(40101,"无权限",""),
     NOT_LOGIN(40100,"未登录",""),
+    FORBIDDEN(40301,"禁止操作",""),
     SYSTEM_ERROR(50000,"系统内部异常","");
     //枚举值
     private final int code;

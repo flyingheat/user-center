@@ -38,7 +38,7 @@ public class PreCacheJob {
     //每天执行，预热推荐用户
     @Scheduled(cron = "0 36 16 * * *")
     public void doCacheRecommendUser(){
-
+        //分布式锁
         RLock lock = redissonClient.getLock("jingrui:precachejob:docache:lock");
         try {
             //只有一个线程能获取到锁

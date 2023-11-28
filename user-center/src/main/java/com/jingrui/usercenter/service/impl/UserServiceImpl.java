@@ -3,15 +3,21 @@ package com.jingrui.usercenter.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.jingrui.usercenter.common.ErrorCode;
 import com.jingrui.usercenter.constant.UserConstant;
 import com.jingrui.usercenter.exception.BusinessException;
+import com.jingrui.usercenter.model.vo.UserVo;
 import com.jingrui.usercenter.service.UserService;
 import com.jingrui.usercenter.model.domain.User;
 import com.jingrui.usercenter.mapper.UserMapper;
+import com.jingrui.usercenter.utils.AlgorithmUtils;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.description.method.MethodDescription;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
@@ -19,13 +25,11 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.jingrui.usercenter.constant.UserConstant.USER_LOGIN_STATE;
 
@@ -301,6 +305,53 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public boolean isAdmin(User loginUser) {
         return loginUser != null && loginUser.getUserRole() == UserConstant.ADMIN_ROLE;
+    }
+
+    @Override
+    public List<User> matchUsers(long num, User loginUser) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id","tags");
+        queryWrapper.isNotNull("tags");
+        List<User> userList = this.list(queryWrapper);
+        String tags = loginUser.getTags();
+        Gson gson = new Gson();
+        List<String> tagList = gson.fromJson(tags, new TypeToken<List<String>>() {}.getType());
+        //用户列表的下表 = 》 相似度 , 排序树
+        List<Pair<User,Long>> list = new ArrayList<>();
+//        SortedMap<Integer,Long> indexDistanceMap = new TreeMap<>();
+        //以此计算所有用户和当前用户的相似度
+        for (int i = 0; i < userList.size(); i++) {
+            User user = userList.get(i);
+            String userTags = user.getTags();
+            //无标签或者当前用户为自己
+            if(StringUtils.isBlank(userTags) || user.getId() == loginUser.getId()){
+                continue;
+            }
+            List<String> userTagList = gson.fromJson(userTags, new TypeToken<List<String>>() {
+            }.getType());
+            //计算分数
+            long distance = AlgorithmUtils.minDistance(tagList, userTagList);
+            list.add(new Pair<>(user,distance));
+        }
+        //降序按编辑距离由小到大
+        List<Pair<User,Long>> topUserPairList = list.stream()
+                .sorted((a,b) -> (int) (a.getValue() - b.getValue())).limit(num)
+                .collect(Collectors.toList());
+        //原本顺序的UserId
+        List<Long> userIdList = topUserPairList.stream().map(pair -> pair.getKey().getId()).collect(Collectors.toList());
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.in("id",userIdList);
+        //原本顺序 1，3，2
+        //后面查出来的顺序是 1，2，3，如何将这个顺序变为原来的顺序，用一个map去存储 1-》User1，2-》User2
+        Map<Long,List<User>> unOrderUsers = this.list(userQueryWrapper)
+                .stream()
+                .map(user -> getSafetyUser(user))
+                .collect(Collectors.groupingBy(User::getId));
+        List<User> finalUserList = new ArrayList<>();
+        for (Long userId : userIdList) {
+            finalUserList.add(unOrderUsers.get(userId).get(0));
+        }
+        return finalUserList;
     }
 
     /**
